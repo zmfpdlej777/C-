@@ -1,41 +1,30 @@
-#include<stdio.h>
-//#include<stdlib.h> //C언어에서 표준 입출력에 관한 명령이 정의된 헤더파일
+#include<iostream>
+using namespace std;
 
-#include<iostream> //C++에서의 표준 입출력에 관한 명령 + a가 정의된 헤더 파일
-//iostream=Input/Output Stram : stdio.h + stdlib.h + string.h
-//							     입출력     동적할당   문자열
+class Person{
+public:
+	string name;
+	int age;
 
-//<헤더 파일 구분>
-// ~~~.h : c언어에서 사용되는 원시헤더 파일(*C는 다른것 사용 불가능)
-// c~~~~ : 원시헤더를 C++용으로 변환시키기 위한 헤더파일
-// ~~~~~ : C++용 헤더 파일
+	Person(string name,int age) {
+		this->age = age;
+		this->name = name;
+	}
+	void shinfo(Person p1) {
+		cout << "이름 : " << p1.name << endl;
+		cout << "나이 : " << p1.age << endl;
+	}
 
-//#(=전처리기) : 컴파일 하기 이전에 먼저 처리되어야 할 명령
-//#incldue : 컴파일하기 이전에 먼저 포함되어야 할 헤더파일을 처리하는 명령
-//#import : 컴파일하기 전에 코드를 불러다 쓰는 명령(포함은 X)
-//#define : 특정 데이터를 '치환'해주는 것
-//NULL==0 *공백X
-
-//Hello world!!! 를 출력
-
-int main() {
-	//int n;
-	//scanf_s("%d", &n);
-	//Hello(n);
-	printf("Hello C!!!\n");
-
-	std::cout << "Hello C++!!!\n";
-// :: (범위지정연산자,스코프연산자): 왼쪽 영역 안에서 좌측의 멤버를 우선적으로 불러 올 수 있게끔 만드는 연산자
-// std::cout => std라는 영역안에 cout이라는 멤버를 불러와라!
-// cout : c++에서의 표준 출력 '객체'
-// << (좌측 쉬프트 연산자) : 연산자에 새로운 기능을 부여 할 수있다.(=연산자 오버로딩)
-// *cout 옆에 오면 출력 대상을 '구별'할 수 있는 연산자가 된다.
-// ex. a=10 ==> std::cout<<"a="<<a<<"\n";
-// *C++은 자동으로 데이터 타입을 검색하여 출력. %d,%s 불필요
-// \n == std::endl; : End Line \n의 역할
+	void eat(Person p1) {
+		cout << p1.name << "이(가) 밥을 먹습니다." << endl;
+	}
+};
 
 
+int main(void) {
+	Person p1 = { "야스오",25 };
+	p1.shinfo(p1);
+	p1.eat(p1);
 
-	return 0; //<-0은 정상종료, 그 이외는 에러코드
-	
+	return 0;
 }
