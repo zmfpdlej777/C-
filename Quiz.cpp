@@ -1,123 +1,146 @@
 #include<iostream>
+
 using namespace std;
 
-class Player {
+class Mobile {
+	//Mobile		휴대전화 클래스
+	//단순히 만드는 것에 그치지 말고, 안정성을 높이기 위해 다음과 같이 강제 구현
+	//[1] 이름은 한번 설정하면 절대로 변경할 수 없습니다
+	//[2] 가격은 아무리 싸게 설정해도 40만원 미만은 불가능합니다
+	//		20만원으로 설정시 40만원으로 설정되도록
+	//[3] 통신사나 가격 등은 계속 변경 설정이 가능하도록
+
 private:
-	char* id;
-	int level = 1;
-	int attack = 5;
-	int hp = 20;
+	char* const name;
+	char* tel;
+	int price;
 
 public:
-	//Player() {}
-	Player(const char* id):id(NULL),level(1),attack(5),hp(20) {
-		cout << "====기본 생성자====" << endl;
-		this->set_id(id);
-	}
-	Player(const char*id,int l) :level(1), attack(5), hp(20) {
-		this->set_id(id);
-		this->set_level(l);
-		this->levelUp(l);
-		/*this->set_attack(a);
-		this->set_hp(h);*/
 
-	}
-	void disp(int i) {
-		cout << "[" << i << "]" << "\t" << id << "\t" << level << "\t" << attack << "\t" << hp << endl;
-	}
-	void disp() {
-		cout << id << "(Lv:" << level << ")" << " 공격력 : " << attack << "/" << " 체력 : " << hp << endl;;
+	//생성자
+	Mobile(const char* name) : name(new char[strlen(name) + 1]), tel(NULL), price(400000) {
+		strcpy_s(this->name, strlen(name) + 1, name);
 	}
 
-	void set_id(const char* id) {
-		if (this->id) delete[] this->id;
-		this->id = new char[strlen(id) + 1];
-		strcpy_s(this->id, strlen(id) + 1, id);
+	Mobile(const char* name, const char* tel, int price) : name(new char[strlen(name) + 1]), tel(NULL) {
+		strcpy_s(this->name, strlen(name) + 1, name);
+		this->setTel(tel);
+		this->setPrice(price);
 	}
-	char* get_id(Player p) {
-		return id;
-	}
-	void set_level(int l) {
-		level = l;
-	}
-	int get_level() {
-		return level;
-	}
-	//void set_attack(int a) {
-	//	attack = a;
-	//}
-	int get_attack() {
-		return attack;
-	}
-	//void set_hp(int h) {
-	//	hp = h;
-	//}
-	int get_hp() {
-		return hp;
-	}
-	
-	void levelUp(int n) {
 
-			level = n;
-			attack += n * 3;
-			hp += n * 10;
+	Mobile(const Mobile& ref) :name(new char[strlen(ref.name) + 1]), tel(NULL), price(ref.price) {
+		strcpy_s(this->name, strlen(ref.name) + 1, ref.name);
+		this->setTel(ref.tel);
+	}
+
+	//setter
+	void setTel(const char* tel) {
+		if (this->tel) {
+			delete[] this->tel;
+		}
+		this->tel = new char[strlen(tel) + 1];
+		strcpy_s(this->tel, strlen(tel) + 1, tel);
+	}
+	void setPrice(int price) {
+		if (price <= 400000) {
+			this->price = 400000;
+			return;
+		}
+		this->price = price;
+	}
+
+	//getter
+	const char* getName() const {
+		return name;
+	}
+	const char* getTel() const {
+		return tel;
+	}
+	int getPrice() const {
+		return price;
+	}
+
+	void disp() const {
+		cout << name << "\t" << tel << "\t" << price << endl;
+	}
+
+	~Mobile() {
+		delete[] tel;
+		delete[] name;
+	}
+
+	void compare(const Mobile& ref) const {
+		if (this->price < ref.price) {
+			cout << ref.name << endl;
+		}
+		else if (this->price > ref.price) {
+			cout << this->name << endl;
+		}
+		else {
+			cout << "같다" << endl;
+		}
+	}
+};
+//기존에 Mobile이라는 클래스를 사용하여 휴대전화 정보를 관리하였습니다.
+//세월이 지나서 항목들이 추가가 되었습니다.
+//Mobile이라는 클래스는 건드리지 않고 상속을 이용하여 추가된 항목까지 
+//저장하게 만들고 싶습니다.
+//이름은 MobileEx로 생성
+//(추가된 항목)	제휴카드(card)	수시로 설정 / 확인 가능
+//				약정기간(month)	휴대폰 약정기간(월)
+
+
+class MobileEx :public Mobile {
+private:
+	char* card; 
+	int month;
+public:
+	MobileEx(const char* name,const char* tel, int price,const char* card,int month):Mobile(name,tel,price),card(new char[strlen(card)+1]),month(0) {
+		//기본생성자
 		
+		setTel(tel);
+		setPrice(price);
+		strcpy_s(this->card, strlen(card) + 1, card);
+		set_month(month);
+	}
+	MobileEx(MobileEx& p):Mobile(p),card(p.card),month(p.month) {
+		//복생
+		strcpy_s(this->card, strlen(card) + 1, card);
 		
 	}
-	~Player() {
-		delete[] id;
-	}
-	Player(const Player& p) :id(NULL),level(p.level),attack(p.attack),hp(p.hp) {
-		cout << "복사 생성자용" << endl;
-		this-> set_id(p.id);
+
+	~MobileEx() {//소멸
+		delete[] card;
 	}
 
-
-};
-//게임 캐릭터 클래스(Player)
-//(항목)아이디(id), 레벨(level), 공격력(attack), 체력(hp)
-//(함수)disp(정보출력), +@(필요하다면)
-//(생성자)알아서
-//(특징)	1. 캐릭터 생성시 레벨은 1, 공격력 5, 체력 20
-//			2. 레벨이 증가할 경우 공격력은 3, 체력은 10씩 증가
-//		아래의 항목을 만드시고 정보 출력
-//		id
-//[1]	공유		레벨 20으로 변경 후 정보 출력
-//[2]	아이유		레벨 15로 변경 후 정보 출력
-//[3]	유인나		레벨 30으로 변경 후 정보 출력
-class Item {
-	char* element;
-	int attack;
-	double speed;
-};
-class Long_Sword:public Item { //상속받기
-	char* name;
-
-	void basic_attack1(Player p){
-		int hp;
-		hp = p->get_hp();
+	//set/get
+	void set_month(int n) {
+		month = n;
 	}
-};
+	int get_month() const {
+		return month;
+	}
+	char* get_card() const {
+		return card;
+	}
+	void disp() const {
+		cout << getName() << "\t" << getTel() << "\t" << getPrice() << "\t" << get_card()<< "\t" << get_month()<<"개월"<<endl;
+	}
 
+};
 
 int main(void) {
-
-	Player p1("공유",20);
-	Player p2("아이유", 15);
-
-	p1.disp();
-
-	cout << endl;
-	Player p3("유인나");
-	p3.disp();
-	p3.levelUp(30);
-	cout << "**레벨업 후" << endl;
-	p3.disp();
-
-	cout << "\n\tID\t" << "LV\t" << "공격력\t" << "체력" << endl;
-	p1.disp(1);
-	p2.disp(2);
-	p3.disp(3);
+	//(아래의 객체를 생성한 뒤 정보 출력)
+	//		name	telecom	price	card		month
+	//[1]	아이폰7	KT		90만원	국민카드		24개월
+	//[2]	갤럭시7	SK		30만원	신한카드		30개월
+	//[3]	G6		LG		35만원	삼성카드		36개월
+	MobileEx m1("I7", "KT", 900000, "국민카드", 24);
+	m1.disp();
+	MobileEx m2("갤럭시7", "SKT", 300000, "신한카드", 30);
+	m2.disp();
+	MobileEx m3("G6", "LG", 350000, "삼성카드", 36);
+	m3.disp();
 
 
 	return 0;
